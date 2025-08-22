@@ -139,9 +139,18 @@ def get_contact1(message, text2=text2):
     bot.send_message(message.chat.id,'Ваш запрос сохранен.')
 
 def admin1(message):
+    bot.send_chat_action(call.message.chat.id, 'typing')
     id1 = message.text
     id1 = int(id1)
     manager.delete_id1(id1)
+    bot.send_message(message.chat.id,'Запрос удален.')
+def admin2(message):
+    bot.send_chat_action(call.message.chat.id, 'typing')
+    id2 = message.text
+    id2 = int(id2)
+    manager.delete_id1(id2)
+    bot.send_message(message.chat.id,'Запрос удален.')
+    
 
 if __name__ == '__main__':
     bot.infinity_polling()
