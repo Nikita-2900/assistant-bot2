@@ -2,8 +2,12 @@ from telebot import TeleBot
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 from logic import *
 from config import *
+import pandas as pd
 
 bot = TeleBot(API_TOKEN)
+
+password1 = PASSWORD1
+password2 = PASSWORD2
 
 manager = DB_Manager(DATABASE)
 
@@ -22,10 +26,37 @@ reg_keyboard2.add(
     InlineKeyboardButton(text='Проблема с сайтом или оплатой', callback_data='7_1'),
     InlineKeyboardButton(text='Проблема с товаром', callback_data='7_2',))
 
+reg_keyboard3 = InlineKeyboardMarkup(row_width=1)
+reg_keyboard3.add(
+    InlineKeyboardButton(text='Проблема с сайтом или оплатой', callback_data='1_1'),
+    InlineKeyboardButton(text='Проблема с товаром', callback_data='1_2',))
+
+reg_keyboard4 = InlineKeyboardMarkup(row_width=1)
+reg_keyboard4.add(
+    InlineKeyboardButton(text='Проблема с сайтом или оплатой', callback_data='2_1'),
+    InlineKeyboardButton(text='Проблема с товаром', callback_data='2_2',))
+
 @bot.message_handler(commands=['start'])
 def help_command(message):
     bot.send_chat_action(message.chat.id, 'typing')
     bot.send_message(message.chat.id, 'Здравствуйте! Это бот тех. поддержки интернет-магазина "Продаем все на свете". Чем могу помочь?', reply_markup=reg_keyboard)
+
+@bot.message_handler(commands=['for_admins'])
+def get_password(message):
+    bot.send_chat_action(message.chat.id, 'typing')
+    bot.send_message(message.chat.id, 'Введите пароль.')
+    bot.register_next_step_handler(call.message, admins)
+def admins(message):
+    password = message.text
+    if password = password1:
+        bot.send_chat_action(message.chat.id, 'typing')
+        bot.send_message(message.chat.id, 'Выберите действие.', reply_markup=reg_keyboard3)
+    elif password = password2:
+        bot.send_chat_action(message.chat.id, 'typing')
+        bot.send_message(message.chat.id, 'Выберите действие.', reply_markup=reg_keyboard4)
+    else:
+        bot.send_chat_action(message.chat.id, 'typing')
+        bot.send_message(message.chat.id, 'Неверный пароль.')
 
 @bot.callback_query_handler(func=lambda call: True)
 def call_handler(call):
@@ -51,6 +82,7 @@ def call_handler(call):
         case '7':
             bot.send_chat_action(call.message.chat.id, 'typing')
             bot.send_message(call.message.chat.id, 'Какая у вас проблема', reply_markup=reg_keyboard2)
+
         case '7_1':
             bot.send_chat_action(call.message.chat.id, 'typing')
             bot.send_message(call.message.chat.id, 'Хорошо, подробно опишите проблему и как она возникла.', reply_markup=reg_keyboard2)
@@ -59,6 +91,28 @@ def call_handler(call):
             bot.send_chat_action(call.message.chat.id, 'typing')
             bot.send_message(call.message.chat.id, 'Хорошо, подробно опишите проблему и как она возникла.', reply_markup=reg_keyboard2)
             bot.register_next_step_handler(call.message, get_text2)
+
+        case '1_1':
+            bot.send_chat_action(call.message.chat.id, 'typing')
+            headings = ["# id ", " Запрос ", " Контакт"]
+            data = manager.get_request1()
+            df = pd.DataFrame(data, columns=headings)
+            bot.send_message(call.message.chat.id, f'{df}')
+        case '1_2':
+            bot.send_chat_action(call.message.chat.id, 'typing')
+            bot.send_message(call.message.chat.id, 'Введите id запроса.')
+            bot.register_next_step_handler(call.message, admin1)
+
+        case '2_1':
+            bot.send_chat_action(call.message.chat.id, 'typing')
+            headings = ["# id ", " Запрос ", " Контакт"]
+            data = manager.get_request2()
+            df = pd.DataFrame(data, columns=headings)
+            bot.send_message(call.message.chat.id, f'{df}')
+        case '2_2':
+            bot.send_chat_action(call.message.chat.id, 'typing')
+            bot.send_message(call.message.chat.id, 'Введите id запроса.')
+            bot.register_next_step_handler(call.message, admin2)
 
 def get_text1(message):
     bot.send_chat_action(call.message.chat.id, 'typing')
@@ -83,6 +137,11 @@ def get_contact1(message, text2=text2):
     id2 = manager.get_id2()
     manager.add_request1(id2, text2, contact2)
     bot.send_message(message.chat.id,'Ваш запрос сохранен.')
+
+def admin1(message):
+    id1 = message.text
+    id1 = int(id1)
+    manager.delete_id1(id1)
 
 if __name__ == '__main__':
     bot.infinity_polling()
