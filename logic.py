@@ -62,6 +62,13 @@ class DB_Manager:
             conn.execute(f'DELETE FROM errors2 WHERE id={id}')
             conn.commit()
 
+    def get_request1(self):
+        conn = sqlite3.connect(self.database)
+        with conn:
+            cur = conn.cursor()
+            cur.execute('SELECT * FROM errors1')
+            return x[] for x in cur.
+
 
 if __name__ == '__main__':
     manager = DB_Manager(DATABASE)
