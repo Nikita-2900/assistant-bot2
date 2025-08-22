@@ -10,10 +10,12 @@ class DB_Manager:
         cur = con.cursor()
         cur.execute('''CREATE TABLE IF NOT EXISTS errors1 (
             id INTEGER,
-            name TEXT)''')
+            name TEXT,
+            contact TEXT)''')
         cur.execute('''CREATE TABLE IF NOT EXISTS errors2 (
             id INTEGER,
-            name TEXT)''')
+            name TEXT,
+            contact TEXT)''')
     
 
     def get_id1(self):
@@ -40,15 +42,15 @@ class DB_Manager:
             x = 0
         return x
 
-    def add_request1(self, id, name):
+    def add_request1(self, id, name, contact):
         conn = sqlite3.connect(self.database)
         with conn:
-            conn.execute('INSERT INTO errors1 VALUES (?, ?)', (id, name))
+            conn.execute('INSERT INTO errors1 VALUES (?, ?, ?)', (id, name, contact))
             conn.commit()
-    def add_request2(self, id, name):
+    def add_request2(self, id, name, contact):
         conn = sqlite3.connect(self.database)
         with conn:
-            conn.execute('INSERT INTO errors2 VALUES (?, ?)', (id, name))
+            conn.execute('INSERT INTO errors2 VALUES (?, ?, ?)', (id, name, contact))
             conn.commit()
     
     def delete_id1(self, id):
@@ -79,6 +81,6 @@ class DB_Manager:
 if __name__ == '__main__':
     manager = DB_Manager(DATABASE)
     manager.create_tables()
-    a = manager.get_id1()
-    b = manager.get_id2()
-    print(a, b)
+    # a = manager.get_id1()
+    # b = manager.get_id2()
+    # print(a, b)
