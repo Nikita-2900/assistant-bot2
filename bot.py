@@ -17,10 +17,15 @@ reg_keyboard.add(
     InlineKeyboardButton(text='Как узнать информацию о доставке?', callback_data='6',),
 InlineKeyboardButton(text='другой вариант', callback_data='7',))
 
-@bot.message_handler(commands=['help'])
+reg_keyboard2 = InlineKeyboardMarkup(row_width=1)
+reg_keyboard2.add(
+    InlineKeyboardButton(text='Проблема с сайтом или оплатой', callback_data='7_1'),
+    InlineKeyboardButton(text='Проблема с товаром', callback_data='7_2',))
+
+@bot.message_handler(commands=['start'])
 def help_command(message):
     bot.send_chat_action(message.chat.id, 'typing')
-    bot.send_message(message.chat.id, 'f', reply_markup=reg_keyboard)
+    bot.send_message(message.chat.id, 'Здравствуйте! Это бот тех. поддержки интернет-магазина "Продаем все на свете". Чем могу помочь?', reply_markup=reg_keyboard)
 
 @bot.callback_query_handler(func=lambda call: True)
 def call_handler(call):
@@ -45,11 +50,39 @@ def call_handler(call):
             bot.send_message(call.message.chat.id, 'Информацию о доставке вы можете найти на странице оформления заказа на нашем сайте. Там указаны доступные способы доставки и сроки.')
         case '7':
             bot.send_chat_action(call.message.chat.id, 'typing')
-            bot.send_message(call.message.chat.id, 'fff')
-            bot.register_next_step_handler(call.message, get_text)
+            bot.send_message(call.message.chat.id, 'Какая у вас проблема', reply_markup=reg_keyboard2)
+        case '7_1':
+            bot.send_chat_action(call.message.chat.id, 'typing')
+            bot.send_message(call.message.chat.id, 'Хорошо, подробно опишите проблему и как она возникла.', reply_markup=reg_keyboard2)
+            bot.register_next_step_handler(call.message, get_text1)
+        case '7_2':
+            bot.send_chat_action(call.message.chat.id, 'typing')
+            bot.send_message(call.message.chat.id, 'Хорошо, подробно опишите проблему и как она возникла.', reply_markup=reg_keyboard2)
+            bot.register_next_step_handler(call.message, get_text2)
 
-def get_text(message):
-    bot.send_message(message.chat.id, 'gggfff')
+def get_text1(message):
+    bot.send_chat_action(call.message.chat.id, 'typing')
+    text1 = message.text
+    bot.send_message(message.chat.id,'Хорошо, укажите свой номер телефона или электронную почту.')
+    bot.register_next_step_handler(call.message, get_contact1, text1)
+def get_contact1(message, text1=text1):
+    bot.send_chat_action(call.message.chat.id, 'typing')
+    contact1 = message.text
+    id1 = manager.get_id1()
+    manager.add_request1(id1, text1, contact1)
+    bot.send_message(message.chat.id,'Ваш запрос сохранен.')
+
+def get_text2(message):
+    bot.send_chat_action(call.message.chat.id, 'typing')
+    text2 = message.text
+    bot.send_message(message.chat.id,'Хорошо, укажите свой номер телефона или электронную почту.')
+    bot.register_next_step_handler(call.message, get_contact2, text2)
+def get_contact1(message, text2=text2):
+    bot.send_chat_action(call.message.chat.id, 'typing')
+    contact2 = message.text
+    id2 = manager.get_id2()
+    manager.add_request1(id2, text2, contact2)
+    bot.send_message(message.chat.id,'Ваш запрос сохранен.')
 
 if __name__ == '__main__':
     bot.infinity_polling()
