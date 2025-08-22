@@ -67,7 +67,13 @@ class DB_Manager:
         with conn:
             cur = conn.cursor()
             cur.execute('SELECT * FROM errors1')
-            return x[] for x in cur.
+            return x[] for x in cur..fetchall()
+    def get_request2(self):
+        conn = sqlite3.connect(self.database)
+        with conn:
+            cur = conn.cursor()
+            cur.execute('SELECT * FROM errors2')
+            return x[] for x in cur..fetchall()
 
 
 if __name__ == '__main__':
